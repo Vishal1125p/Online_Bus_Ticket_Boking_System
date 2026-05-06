@@ -1,0 +1,36 @@
+package com.bhairavnath.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import com.bhairavnath.entity.Booking;
+
+@Service
+public class EmailService {
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    public void sendTicketEmail(Booking booking) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(booking.getUser().getEmail());
+        message.setSubject("🎟️ Ticket Confirmed - Bhairavnath Travels");
+
+        message.setText(
+                "Hello " + booking.getUser().getName() + ",\n\n" +
+                "Your ticket is confirmed ✅\n\n" +
+                "Bus: " + booking.getBus().getName() + "\n" +
+                "Route: " + booking.getFromCity() + " → " + booking.getToCity() + "\n" +
+                "Date: " + booking.getJourneyDate() + "\n" +
+                "Seat: " + booking.getSeatNo() + "\n" +
+                "Amount: ₹" + booking.getPrice() + "\n\n" +
+                "Happy Journey 🚍\n" +
+                "Bhairavnath Travels"
+        );
+
+        mailSender.send(message);
+    }
+}

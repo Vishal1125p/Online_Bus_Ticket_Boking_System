@@ -1,0 +1,28 @@
+spring.application.name=BHAIRAVNATH_TRAVELS
+
+## Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/Bhairavnaths
+spring.datasource.username=root
+spring.datasource.password=Vishu@1125
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+## JPA / Hibernate Settings
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+## Correct Dialect for Hibernate 6+ / 7+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+## (Optional) Logs for debugging
+logging.level.org.hibernate.SQL=DEBUG
+#spring.h2.console.enabled=true
+#spring.h2.console.path=/h2-console
+
+# ================= EMAIL CONFIG =================
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=vishalpatil40802@gmail.com
+spring.mail.password=yrkc vtvy dfiz yadf
+
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true

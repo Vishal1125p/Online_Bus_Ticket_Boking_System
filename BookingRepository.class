@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Bus Search</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+	<!-- HEADER -->
+	<nav class="bg-success text-white px-4 py-3 d-flex justify-content-between">
+		<h4 class="mb-0">BHAIRONATH BUS</h4>
+		<a href="/" class="text-white text-decoration-none">Home</a>
+	</nav>
+
+	<div class="container my-4">
+
+		<p class="fw-bold mb-3">
+			<span th:text="${#lists.size(buses)}"></span> buses found
+		</p>
+
+		<!-- ================= BUS CARD ================= -->
+		<div th:each="bus : ${buses}" class="card shadow-sm p-3 mb-3">
+
+			<div class="row align-items-center">
+				<div class="col-md-7">
+					<h5 class="fw-bold" th:text="${bus.departureTime}"></h5>
+					<p class="text-muted mb-1">
+						<span th:text="${bus.fromCity}"></span> →
+						<span th:text="${bus.toCity}"></span>
+					</p>
+					<small th:text="${bus.name}"></small>
+				</div>
+
+				<div class="col-md-3 text-center">
+					<h4 class="fw-bold">₹ <span th:text="${bus.price}"></span></h4>
+				</div>
+
+				<div class="col-md-2 text-end">
+					<button class="btn btn-success fw-bold" data-bs-toggle="offcanvas"
+						th:data-bs-target="'#pickupCanvas' + ${bus.id}">
+						Continue →
+					</button>
+				</div>
+			</div>
+
+			<!-- ================= PICKUP / DROP OFFCANVAS ================= -->
+			<div class="offcanvas offcanvas-end" tabindex="-1" th:id="'pickupCanvas' + ${bus.id}">
+
+				<div class="offcanvas-header">
+					<h5 class="fw-bold">Pickup & Drop</h5>
+					<button class="btn-close" data-bs-dismiss="offcanvas"></button>
+				</div>
+
+				<div class="offcanvas-body">
+
+					<p class="fw-bold">Pick-up</p>
+
+					<label class="border rounded p-3 d-block mb-3">
+						<input type="radio" th:name="'pickup' + ${bus.id}"
+							th:onclick="'enableSeatBtn(' + ${bus.id} + ')'">
+						<span th:text="${bus.pickupPoint}"></span> –
+						<span th:text="${bus.pickupTime}"></span>
+					</label>
+
+					<p class="fw-bold mt-3">Drop-off</p>
+
+					<label class="border rounded p-3 d-block mb-4">
+						<input type="radio" th:name="'drop' + ${bus.id}"
+							th:onclick="'enableSeatBtn(' + ${bus.id} + ')'">
+						<span th:text="${bus.dropPoint}"></span> –
+						<span th:text="${bus.dropTime}"></span>
+					</label>
+
+					<button class="btn btn-success w-100 fw-bold" th:id="'seatBtn' + ${bus.id}" disabled
+						th:onclick="'openSeat(' + ${bus.id} + ')'">
+						Continue to Seat Selection →
+					</button>
+
+				</div>
+			</div>
+
+			<!-- ================= SEAT SELECTION OFFCANVAS ================= -->
+			<div class="offcanvas offcanvas-end" tabindex="-1" th:id="'seatCanvas' + ${bus.id}">
+
+				<div class="offcanvas-header">
+					<h5 class="fw-bold">Select Seats</h5>
+					<button class="btn-close" data-bs-dismiss="offcanvas"></button>
+				</div>
+
+				<div class="offcanvas-body">
+
+					<p class="fw-bold mb-2">
+						<span th:text="${bus.fromCity}"></span> →
+						<span th:text="${bus.toCity}"></span>
+					</p>
+
+					<!-- SEATS -->
+					<div class="d-grid mb-3" style="grid-template-columns: repeat(4,1fr); gap:12px">
+
+						<div class="seat available" th:onclick="'selectSeat(this,' + ${bus.id} + ')'">🪑</div>
+
+						<div class="seat available" th:onclick="'selectSeat(this,' + ${bus.id} + ')'">🪑</div>
+
+						<div class="seat booked">🪑</div>
+
+						<div class="seat available" th:onclick="'selectSeat(this,' + ${bus.id} + ')'">🪑</div>
+					</div>
+
+					<p th:id="'seatStatus' + ${bus.id}" class="text-muted">
+						No seat selected
+					</p>
+
+					<button class="btn btn-success fw-bold mt-2"
+					        onclick="goToPayment()">
+					    Continue →
+					</button>
+
+					<input type="hidden" id="loggedInFlag" th:value="${loggedIn}">
+					<input type="hidden" id="seatSelectedFlag" value="false">
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- ================= STYLE ================= -->
+	<style>
+		.seat {
+			border: 2px solid #ccc;
+			border-radius: 10px;
+			padding: 16px;
+			text-align: center;
+			cursor: pointer;
+			font-size: 20px;
+		}
+
+		.seat.available:hover {
+			border-color: green;
+		}
+
+		.seat.selected {
+			border-color: green;
+			background: #e9fbe9;
+		}
+
+		.seat.booked {
+			background: #eee;
+			cursor: not-allowed;
+		}
+	</style>
+
+	<!-- ================= SCRIPT ================= -->
+	<script>
+		function enableSeatBtn(id) {
+			document.getElementById("seatBtn" + id).disabled = false;
+		}
+
+		function openSeat(id) {
+			// close pickup
+			const pickup = bootstrap.Offcanvas.getInstance(
+				document.getElementById("pickupCanvas" + id)
+			);
+			pickup.hide();
+
+			// open seat
+			const seat = new bootstrap.Offcanvas(
+				document.getElementById("seatCanvas" + id)
+			);
+			seat.show();
+		}
+
+		function selectSeat(el, id) {
+			if (el.classList.contains("booked")) return;
+
+			document.querySelectorAll("#seatCanvas" + id + " .seat")
+				.forEach(s => s.classList.remove("selected"));
+
+			el.classList.add("selected");
+
+			document.getElementById("seatStatus" + id).innerText =
+				"1 seat selected";
+
+			document.getElementById("finalContinue" + id)
+				.classList.remove("disabled");
+		}
+	</script>
+	<script>
+	function checkLoginAndOpen(busId) {
+
+	    const loggedIn =
+	        document.getElementById("loggedInFlag").value === "true";
+
+	    if (!loggedIn) {
+	        openLoginModal(busId);   // 🔥 OPEN MODAL
+	        return;
+	    }
+
+	    // logged in → open pickup
+	    new bootstrap.Offcanvas(
+	        document.getElementById("pickupCanvas" + busId)
+	    ).show();
+	}
+	</script>
+
+	<script>
+	function goToPayment() {
+	    const loggedIn =
+	        document.getElementById("loggedInFlag").value === "true";
+
+	    if (!loggedIn) {
+	        openLoginModal('payment');
+	        return;
+	    }
+
+	    window.location.href = "/payment";
+	}
+	</script>
+	<script>
+	function selectSeat(el, id) {
+	    if (el.classList.contains("booked")) return;
+
+	    document.querySelectorAll("#seatCanvas" + id + " .seat")
+	        .forEach(s => s.classList.remove("selected"));
+
+	    el.classList.add("selected");
+
+	    document.getElementById("seatStatus" + id).innerText =
+	        "1 seat selected";
+
+	    // ✅ MARK SEAT SELECTED
+	    document.getElementById("seatSelectedFlag").value = "true";
+	}
+	</script>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

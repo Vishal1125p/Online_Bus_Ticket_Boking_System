@@ -1,0 +1,37 @@
+package com.bhairavnath.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import com.bhairavnath.Repository.UserRepository;
+import com.bhairavnath.entity.User;
+
+import jakarta.servlet.http.HttpSession;
+@Controller
+public class AuthController {
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @PostMapping("/login")
+    public String login(@RequestParam String email,
+                        @RequestParam String password,
+                        HttpSession session) {
+
+        User user = userRepo.findByEmailAndPassword(email, password);
+
+        if (user != null) {
+            session.setAttribute("user", user);
+            return "redirect:/";
+        }
+
+        return "redirect:/?loginError";
+    }
+
+    @PostMapping("/register")
+    public String register(@ModelAttribute User user) {
+        userRepo.save(user);
+        return "redirect:/?registered";
+    }
+}

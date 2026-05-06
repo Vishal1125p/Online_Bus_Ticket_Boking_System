@@ -1,0 +1,47 @@
+package com.bhairavnath.controller;
+
+import java.time.LocalDate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.bhairavnath.Repository.BookingRepository;
+import com.bhairavnath.Repository.BusRepository;
+import com.bhairavnath.entity.Booking;
+import com.bhairavnath.entity.Bus;
+
+
+@Controller
+public class BookingController {
+
+    @Autowired
+    private BookingRepository bookingRepo;
+
+    @Autowired
+    private BusRepository busRepo;
+
+    @PostMapping("/book")
+    public String bookTicket(
+            @RequestParam int busId,
+            @RequestParam String from,
+            @RequestParam String to,
+            @RequestParam String date,
+            @RequestParam int passenger) {
+
+        Bus bus = busRepo.findById(busId).get();
+
+        Booking booking = new Booking();
+        booking.setBus(bus);
+        booking.setFromCity(from);
+        booking.setToCity(to);
+        booking.setJourneyDate(LocalDate.parse(date));
+        booking.setPassenger(passenger);
+        booking.setStatus("CONFIRMED");
+
+        bookingRepo.save(booking); // ✅ DB madhe save
+
+        return "success";
+    }
+}

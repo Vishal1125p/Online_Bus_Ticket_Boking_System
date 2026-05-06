@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bhaironath Travels | Admin Bookings</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fb;
+        }
+
+        /* ================= NAVBAR ================= */
+        .topbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            position: relative;
+            z-index: 1055;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: #333 !important;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #0d6efd !important;
+        }
+
+        .dropdown-menu {
+            z-index: 1060 !important;
+        }
+
+        .container-fluid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ================= TABLE ================= */
+        .card {
+            border-radius: 14px;
+        }
+
+        table th {
+            background: #1e3c72;
+            color: #fff;
+            text-align: center;
+        }
+
+        table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= TOP NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg topbar shadow-sm px-4">
+
+    <!-- LEFT : APP NAME -->
+    <a class="navbar-brand fw-bold text-primary" href="/admin/dashboard">
+        🚌 Bhaironath Travels
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="adminNav">
+
+        <!-- RIGHT : MENU + PROFILE -->
+        <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/dashboard">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/add-bus">
+                    <i class="bi bi-plus-circle"></i> Add Bus
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/buses">
+                    <i class="bi bi-bus-front"></i> View Buses
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" href="/admin/bookings">
+                    <i class="bi bi-receipt"></i> Bookings
+                </a>
+            </li>
+			<li class="nav-item">
+						    <a href="/admin/rent-requests" class="nav-link">
+						        🚌 Rent Requests
+						    </a>
+						</li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/users">
+                    <i class="bi bi-people"></i> Users
+                </a>
+            </li>
+
+            <!-- ADMIN PROFILE -->
+            <li class="nav-item dropdown ms-2">
+                <a class="nav-link dropdown-toggle d-flex align-items-center"
+                   href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-4 me-1"></i>
+                    <span class="fw-semibold">Admin</span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li>
+                        <a class="dropdown-item" href="/admin/profile">
+                            <i class="bi bi-person"></i> Profile
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger fw-semibold" href="/admin/logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="container-fluid mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">📑 All Bookings</h4>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="card shadow-lg">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+
+                    <thead>
+                    <tr>
+                        <th>Sr No</th>
+                        <th>User Name</th>
+                        <th>User Email</th>
+                        <th>Bus Name</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Date</th>
+                        <th>Seat No</th>
+                        <th>Price (₹)</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="b, stat : ${bookings}">
+                        <td th:text="${stat.count}"></td>
+                        <td th:text="${b.user.name}"></td>
+                        <td th:text="${b.user.email}"></td>
+                        <td th:text="${b.bus.name}"></td>
+                        <td th:text="${b.fromCity}"></td>
+                        <td th:text="${b.toCity}"></td>
+                        <td th:text="${b.journeyDate}"></td>
+                        <td th:text="${b.seatNo}"></td>
+                        <td th:text="${b.price}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${b.status=='BOOKED'} ? 'bg-success' : 'bg-danger'"
+                                  th:text="${b.status}">
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(bookings)}">
+                        <td colspan="10" class="text-center text-muted fw-bold">
+                            No bookings found
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

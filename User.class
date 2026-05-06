@@ -1,0 +1,17 @@
+<div class="container mt-4">
+    <h4 class="fw-bold mb-3">Registered Users</h4>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+
+        <tr th:each="u : ${users}">
+            <td th:text="${u.id}"></td>
+            <td th:text="${u.name}"></td>
+            <td th:text="${u.email}"></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Bus Ticket Booking</title>
+
+	<!-- Bootstrap 5 -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- Tailwind CSS -->
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+	<!-- NAVBAR -->
+	<nav class="bg-lime-500 text-white px-6 py-3 d-flex justify-content-between align-items-center">
+		<div class="fw-bold fs-4">BHAIRONATH BUS</div>
+
+		<div class="d-flex gap-3 align-items-center">
+
+			<a href="#" class="text-white text-decoration-none">Plan Journey</a>
+			<a href="#" class="text-white text-decoration-none">Service</a>
+			<a href="#" class="text-white text-decoration-none">Help</a>
+
+			<!-- NOT LOGGED IN -->
+			<button th:if="${!loggedIn}" class="btn btn-light fw-bold" onclick="openLoginModal('payment')">
+				Login / Register
+			</button>
+
+			<!-- LOGGED IN -->
+			<div th:if="${loggedIn}" class="dropdown">
+				<button class="btn btn-light dropdown-toggle fw-bold" data-bs-toggle="dropdown">
+					👤 <span th:text="${user.name}">User</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="/my-bookings">My Bookings</a></li>
+					<li><a class="dropdown-item" href="/logout">Logout</a></li>
+				</ul>
+			</div>
+
+		</div>
+	</nav>
+
+
+
+
+	<!-- HERO SECTION -->
+	<section class="relative bg-cover bg-center h-[450px]"
+		style="background-image:url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957');">
+
+		<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+
+		<div class="relative container mx-auto pt-20 text-center text-white">
+			<h1 class="text-3xl md:text-4xl font-bold mb-6">
+				Trusted by travellers
+			</h1>
+
+			<!-- SEARCH BOX -->
+			<form action="/search" class="bg-white text-black rounded-xl shadow-lg p-4 md:p-5 mx-auto max-w-5xl">
+
+				<!-- Trip Type -->
+				<div class="flex gap-4 mb-3">
+					<label class="flex items-center gap-1">
+						<input type="radio" name="trip" checked class="form-check-input">
+						One Way
+					</label>
+					<label class="flex items-center gap-1">
+						<input type="radio" name="trip" class="form-check-input">
+						Round Trip
+					</label>
+				</div>
+
+				<!-- Fields -->
+				<div class="row g-2 align-items-end">
+					<div class="col-md-3">
+						<select name="from" class="form-select">
+							<option value="">From</option>
+							<option th:each="c : ${cities}" th:text="${c}" th:value="${c}">
+							</option>
+						</select>
+					</div>
+
+					<div class="col-md-3">
+						<select name="to" class="form-select">
+							<option value="">To</option>
+							<option th:each="c : ${cities}" th:text="${c}" th:value="${c}">
+							</option>
+						</select>
+					</div>
+
+					<div class="col-md-2">
+						<input type="date" name="date" class="form-control">
+					</div>
+
+					<div class="col-md-2">
+						<select name="passenger" class="form-select">
+							<option th:each="p : ${passengers}" th:text="${p}">
+							</option>
+						</select>
+					</div>
+
+					<div class="col-md-2 d-grid">
+						<button class="btn bg-lime-500 text-white fw-bold">
+							Search
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- ================= LOGIN / REGISTER MODAL ================= -->
+		<div class="modal fade" id="authModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<h5 class="modal-title" id="authTitle">Login</h5>
+						<button class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+
+					<div class="modal-body">
+
+						<!-- LOGIN -->
+						<form id="loginForm" action="/login" method="post">
+
+							<input type="hidden" name="redirect" value="seat">
+							<input type="hidden" id="busIdField" name="busId">
+
+							<div class="mb-3">
+								<label>Email</label>
+								<input type="email" name="email" class="form-control" required>
+							</div>
+
+							<div class="mb-3">
+								<label>Password</label>
+								<input type="password" name="password" class="form-control" required>
+							</div>
+
+							<button class="btn btn-success w-100 fw-bold">Login</button>
+						</form>
+
+						<!-- REGISTER -->
+						<form id="registerForm" action="/register" method="post" style="display:none">
+
+							<div class="mb-3">
+								<label>Full Name</label>
+								<input type="text" name="name" class="form-control" required>
+							</div>
+
+							<div class="mb-3">
+								<label>Email</label>
+								<input type="email" name="email" class="form-control" required>
+							</div>
+
+							<div class="mb-3">
+								<label>Password</label>
+								<input type="password" name="password" class="form-control" required>
+							</div>
+
+							<button class="btn btn-primary w-100 fw-bold">Register</button>
+						</form>
+
+					</div>
+
+					<div class="modal-footer justify-content-center">
+						<a href="#" onclick="toggleAuth()">Login / Register</a>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</section>
+
+
+	<!-- ================= FEATURES ================= -->
+	<section class="max-w-7xl mx-auto my-16 px-4">
+		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 text-center">
+
+			<!-- Feature 1 -->
+			<div class="flex flex-col items-center">
+				<div class="text-lime-500 text-5xl mb-4">🪑</div>
+				<h5 class="text-lg font-semibold mb-2">Comfort on board</h5>
+				<p class="text-gray-600 text-sm">
+					Comfortable sleeper & semi-sleeper buses with AC.
+				</p>
+			</div>
+
+			<!-- Feature 2 -->
+			<div class="flex flex-col items-center">
+				<div class="text-lime-500 text-5xl mb-4">🛡️</div>
+				<h5 class="text-lg font-semibold mb-2">Safety & Trust</h5>
+				<p class="text-gray-600 text-sm">
+					Real-time GPS tracking and trusted operators.
+				</p>
+			</div>
+
+			<!-- Feature 3 -->
+			<div class="flex flex-col items-center">
+				<div class="text-lime-500 text-5xl mb-4">💳</div>
+				<h5 class="text-lg font-semibold mb-2">Travel made easy</h5>
+				<p class="text-gray-600 text-sm">
+					Hassle-free booking & secure payment system.
+				</p>
+			</div>
+
+			<!-- Feature 4 -->
+			<div class="flex flex-col items-center">
+				<div class="text-lime-500 text-5xl mb-4">📍</div>
+				<h5 class="text-lg font-semibold mb-2">Connecting the world</h5>
+				<p class="text-gray-600 text-sm">
+					8,000+ destinations across 40+ countries.
+				</p>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- ================= WHERE TO NEXT ================= -->
+	<section class="max-w-7xl mx-auto my-16 px-4">
+
+		<!-- Top Text -->
+		<h2 class="text-center text-2xl md:text-3xl font-semibold mb-10">
+			Top travel choice for
+			<span class="text-lime-500 font-bold">9+ crore people</span>
+			in 2024.
+		</h2>
+
+		<!-- Card -->
+		<div
+			class="relative bg-gradient-to-r from-blue-100 to-blue-300 rounded-3xl overflow-hidden p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+
+			<!-- LEFT CONTENT -->
+			<div class="md:w-1/2">
+				<h3 class="text-2xl md:text-3xl font-bold mb-4">
+					Where to next?
+				</h3>
+				<p class="text-gray-700 mb-6">
+					Discover our travel map with over
+					<span class="font-semibold">8000 destinations</span>
+					worldwide.
+				</p>
+
+				<button
+					class="flex items-center gap-2 bg-lime-500 hover:bg-lime-600 text-white font-semibold px-6 py-3 rounded-lg shadow">
+					🗺️ Explore the map
+				</button>
+			</div>
+
+			<!-- RIGHT CONTENT (Illustration Area) -->
+			<div class="md:w-1/2 relative">
+
+				<!-- City Cards -->
+				<div class="absolute top-4 right-4 bg-white rounded-lg shadow px-4 py-2 text-sm">
+					<b>Mexico City</b>
+					<p class="text-gray-500 text-xs">3h47m · Direct trip</p>
+				</div>
+
+				<div class="absolute top-20 right-24 bg-white rounded-lg shadow px-4 py-2 text-sm">
+					<b>Mumbai</b>
+					<p class="text-gray-500 text-xs">12h21m · 2 Transfers</p>
+				</div>
+
+				<div class="absolute bottom-12 right-10 bg-white rounded-lg shadow px-4 py-2 text-sm">
+					<b>New York</b>
+					<p class="text-gray-500 text-xs">4h44m · Direct trip</p>
+				</div>
+
+				<!-- Bus -->
+				<div class="absolute bottom-0 left-10">
+					<div class="bg-lime-500 text-white px-6 py-2 rounded-full font-bold shadow">
+						FLIXBUS
+					</div>
+				</div>
+
+				<!-- Placeholder Illustration -->
+				<div class="h-64"></div>
+			</div>
+
+		</div>
+
+	</section>
+	<!-- ================= POPULAR CITIES ================= -->
+	<section class="max-w-7xl mx-auto px-4 py-12">
+
+		<h2 class="text-center text-xl md:text-2xl font-semibold mb-6">
+			Popular Cities and Connections
+		</h2>
+
+		<!-- Tabs -->
+		<div class="flex justify-center gap-8 border-b mb-8">
+			<button class="pb-2 border-b-2 border-lime-500 text-lime-600 font-semibold">
+				Cities
+			</button>
+			<button class="pb-2 text-gray-500 hover:text-lime-600">
+				Connections
+			</button>
+		</div>
+
+		<!-- Cities Grid -->
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-gray-700 text-sm md:text-base">
+
+			<div class="space-y-2">
+				<p>Delhi</p>
+				<p>Pune</p>
+				<p>Gurugram</p>
+				<p>Mumbai</p>
+				<p>Goa</p>
+			</div>
+
+			<div class="space-y-2">
+				<p>Bengaluru</p>
+				<p>Dehradun</p>
+				<p>Jaipur</p>
+				<p>Coimbatore</p>
+				<p>Madurai</p>
+			</div>
+
+			<div class="space-y-2">
+				<p>Chennai</p>
+				<p>Chandigarh</p>
+				<p>Vijayawada</p>
+				<p>Greater Noida</p>
+				<p>Noida</p>
+			</div>
+
+			<div class="space-y-2">
+				<p>Hyderabad</p>
+				<p>Lucknow</p>
+				<p>Manali</p>
+				<p>Bareilly</p>
+				<p>Rishikesh</p>
+			</div>
+
+		</div>
+	</section>
+	<!-- ================= FOOTER ================= -->
+	<footer class="border-t mt-12">
+		<div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm text-gray-700">
+
+			<!-- Bus Travel -->
+			<div>
+				<h4 class="font-semibold mb-4 text-black">Bus Travel</h4>
+				<ul class="space-y-2">
+					<li>All Bus Destinations</li>
+					<li>Route Map</li>
+					<li>Bus Travel in India</li>
+					<li>Overnight Buses</li>
+					<li>Get the App</li>
+				</ul>
+			</div>
+
+			<!-- Discover -->
+			<div>
+				<h4 class="font-semibold mb-4 text-black">Discover</h4>
+				<ul class="space-y-2">
+					<li>Discover India</li>
+					<li>Bus to Delhi</li>
+					<li>Bus to Bangalore</li>
+					<li>Bus to Hyderabad</li>
+					<li>Bus to Manali</li>
+					<li>Bus to Jodhpur</li>
+					<li>Bus to Dehradun</li>
+					<li>Bus to Lucknow</li>
+				</ul>
+			</div>
+
+			<!-- FlixBus -->
+			<div>
+				<h4 class="font-semibold mb-4 text-black">FlixBus</h4>
+				<ul class="space-y-2">
+					<li>About Flix</li>
+					<li>General Conditions for Business and Booking</li>
+					<li>General Terms and Conditions of Travel</li>
+					<li>Jobs</li>
+					<li>News Room</li>
+					<li>Partner Agents Login</li>
+				</ul>
+			</div>
+
+			<!-- Customer Care -->
+			<div>
+				<h4 class="font-semibold mb-4 text-black">Customer Care</h4>
+				<ul class="space-y-2">
+					<li>Help</li>
+					<li>Services</li>
+					<li>Flix Lounge</li>
+					<li>Manage My Booking</li>
+					<li>Seat Reservations</li>
+					<li>Luggage</li>
+				</ul>
+			</div>
+
+		</div>
+	</footer>
+
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		function openLoginModal(busId) {
+			document.getElementById("busIdField").value = busId || '';
+			new bootstrap.Modal(document.getElementById("authModal")).show();
+		}
+
+		function toggleAuth() {
+			const login = document.getElementById("loginForm");
+			const register = document.getElementById("registerForm");
+			const title = document.getElementById("authTitle");
+
+			if (login.style.display === "none") {
+				login.style.display = "block";
+				register.style.display = "none";
+				title.innerText = "Login";
+			} else {
+				login.style.display = "none";
+				register.style.display = "block";
+				title.innerText = "Register";
+			}
+		}
+	</script>
+
+</body>
+
+</html>

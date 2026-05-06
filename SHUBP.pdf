@@ -1,0 +1,13 @@
+package com.bhairavnath.Repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.bhairavnath.entity.Bus;
+
+
+public interface BusRepository extends JpaRepository<Bus, Long> {
+
+    List<Bus> findByFromCityAndToCity(String fromCity, String toCity);
+}

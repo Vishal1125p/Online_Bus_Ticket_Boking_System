@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Bus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+
+        <h4 class="fw-bold mb-3">➕ Add New Bus</h4>
+
+        <form action="/admin/save-bus" method="post">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label>Bus Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label>From City</label>
+                    <input type="text" name="fromCity" class="form-control" required>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label>To City</label>
+                    <input type="text" name="toCity" class="form-control" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>Departure Time</label>
+                    <input type="text" name="departureTime" class="form-control" placeholder="6:45 PM">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>Price (₹)</label>
+                    <input type="number" name="price" class="form-control" required>
+                </div>
+
+                <!-- PICKUP -->
+                <div class="col-md-6 mb-3">
+                    <label>Pickup Point</label>
+                    <input type="text" name="pickupPoint" class="form-control" placeholder="RK Ashram">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label>Pickup Time</label>
+                    <input type="text" name="pickupTime" class="form-control" placeholder="6:00 PM">
+                </div>
+
+                <!-- DROP -->
+                <div class="col-md-6 mb-3">
+                    <label>Drop Point</label>
+                    <input type="text" name="dropPoint" class="form-control" placeholder="Private Bus Stand">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label>Drop Time</label>
+                    <input type="text" name="dropTime" class="form-control" placeholder="7:25 AM">
+                </div>
+
+            </div>
+
+            <button class="btn btn-success fw-bold">Save Bus</button>
+
+            <p th:if="${param.success}" class="text-success fw-bold mt-3">
+                ✅
+            </p>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
